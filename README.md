@@ -46,5 +46,5 @@ python3 tools/check_publication.py --history
 конфиги. Для HTTP-тестов требуется возможность открыть loopback-сокет.
 Аппаратные сетевые проверки на работающем шлюзе запускаются отдельно.
 
-Начните с [docs/README.md](docs/README.md). Снимок подготовлен для Git;
-удалённый репозиторий не создаётся автоматически.
+Начните с [docs/README.md](docs/README.md). Исходники доступны в
+[OdincovMD/pi-hardbox](https://github.com/OdincovMD/pi-hardbox), ветка main.
