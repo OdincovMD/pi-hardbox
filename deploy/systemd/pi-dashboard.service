@@ -1,0 +1,26 @@
+[Unit]
+Description=PI Hardbox telemetry dashboard
+After=network.target docker.service
+Wants=docker.service
+
+[Service]
+Type=simple
+User=admin
+Group=admin
+WorkingDirectory=/opt/pi-dashboard
+ExecStart=/usr/bin/python3 /opt/pi-dashboard/dashboard.py
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+MemoryMax=96M
+
+[Install]
+WantedBy=multi-user.target

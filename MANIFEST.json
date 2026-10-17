@@ -1,0 +1,242 @@
+{
+  ".gitattributes": {
+    "sha256": "f7c15f2824c3987d9bbb836f6d1e7dbe1c925ddf09963e96d7c9f9c80de63c98",
+    "bytes": 151
+  },
+  ".githooks/pre-commit": {
+    "sha256": "8da8f1ae302b44110c4f1e77cbd73104e646e9f60a956e690415c2db8cd2f498",
+    "bytes": 67
+  },
+  ".gitignore": {
+    "sha256": "f1831f9e9075a13d7f5dc181b08824aa02d4bbba028e02983bd51557e6ae1c0f",
+    "bytes": 615
+  },
+  "AGENTS.md": {
+    "sha256": "7c4f29285b8de5e7882e69432b7b7d78d19fa65f4c7e1a3677501a4742fede0f",
+    "bytes": 766
+  },
+  "PUBLISHING.md": {
+    "sha256": "0288fe480db2cb3bfe0bb6cf3764a3bdc7c900d104e04d4ecfa683315d6a3b0b",
+    "bytes": 2811
+  },
+  "README.md": {
+    "sha256": "2709237ad1bb753a82932844b53bca3d9b3972aae3ea45b63a03ad270c84490b",
+    "bytes": 3551
+  },
+  "SECURITY.md": {
+    "sha256": "23dd25ebec03d7a6d35244ee879767ecce2bf9c7a7cb24eac2f513d114e1f4b5",
+    "bytes": 2907
+  },
+  "dashboard/DESIGN.md": {
+    "sha256": "1ed0d6ea3269b3f1b6897b09198b6e09b8718936eeb457f624cd148b07f7db38",
+    "bytes": 9585
+  },
+  "dashboard/UX-CONTRACT.md": {
+    "sha256": "1f33e56310102e91c3de514e289b4c7a980931596d9c71f720809c7b0c85705c",
+    "bytes": 6690
+  },
+  "dashboard/admin_controller.py": {
+    "sha256": "a4cf3c52037b9d692295bc5153c0c846dfccdc6ee7fa460b3fd044487b2fb9de",
+    "bytes": 9751
+  },
+  "dashboard/assets/README.md": {
+    "sha256": "84803ff30a47b23c875f90652f03d99d264696db70a797866463b47780a5ade0",
+    "bytes": 652
+  },
+  "dashboard/assets/apple-touch-icon.png": {
+    "sha256": "5acddfcb4c60e94987d9caa5d6f86e144cc90c732c4f76b75ec409d2bd35f20e",
+    "bytes": 6388
+  },
+  "dashboard/assets/favicon-256.png": {
+    "sha256": "eada6c53931e4cfed0c7b0d54b814254cd8d4839c1eb104bdb3f267c23816a0a",
+    "bytes": 8722
+  },
+  "dashboard/assets/favicon.ico": {
+    "sha256": "473256bf530134fc7b791a145657d9aa464c6ddad18bc729c0952c9c977a1df9",
+    "bytes": 8744
+  },
+  "dashboard/assets/favicon.svg": {
+    "sha256": "1709cc6c0d345878daa6ced6ceb63d7ac22cfd7de3cd5042866f3fe437d6803f",
+    "bytes": 387
+  },
+  "dashboard/assets/share-cover-source.png": {
+    "sha256": "f4afffb18a8f11376c450065a036e32d590a7ab8586969ef664990d77eca7f3c",
+    "bytes": 1577459
+  },
+  "dashboard/dashboard.py": {
+    "sha256": "b2c4cce227a9093c71a44b5427611839659ad602e235cbc0772611453dfd492a",
+    "bytes": 125419
+  },
+  "dashboard/fan_controller.py": {
+    "sha256": "831cb80b326b8e7ebb332b25d75ef3e4a8267f6cf3c88c7086bbc1fd97cd11ec",
+    "bytes": 5920
+  },
+  "dashboard/img2txt_llm_health.py": {
+    "sha256": "8b436139991df33eb9a5bb45c8a68c47444616521edbe3dc28c5d631b25d344b",
+    "bytes": 2010
+  },
+  "dashboard/img2txt_vpn_sync.py": {
+    "sha256": "80e5d27b861f13700d03cd1c25d0ddcc0e08814a3021fe2041194e595d71a54f",
+    "bytes": 4886
+  },
+  "dashboard/project_monitor.py": {
+    "sha256": "713e8a80005bab8ff66aff24fc9934ea45e8256d3d1dfcc922f8fac7f3348b40",
+    "bytes": 7689
+  },
+  "dashboard/test_admin_control.py": {
+    "sha256": "6f87f55a4b2fc40ff15caa85347240cc637184c063ed6f7736e74516e0b6bc89",
+    "bytes": 6495
+  },
+  "dashboard/test_cpu_telemetry.py": {
+    "sha256": "885480dbf1a67b2626df98d2a098b359110c4781f426612078944849541cd9bd",
+    "bytes": 2349
+  },
+  "dashboard/test_fan_control.py": {
+    "sha256": "1670df2df0f4e78425bc1f03e8c57a57ccc0913d00ec259cbc35c2e2a7af40a7",
+    "bytes": 8187
+  },
+  "dashboard/test_img2txt_llm_health.py": {
+    "sha256": "add30d8d92814b348c79b9b25266801fb9d60f26b3b0163fa283a9071953225b",
+    "bytes": 2327
+  },
+  "dashboard/test_img2txt_sync.py": {
+    "sha256": "edc0fcb4c61fb98ca5b1656793443be383ab0934f8f971d15845ec5258d72894",
+    "bytes": 7066
+  },
+  "dashboard/test_project_status.py": {
+    "sha256": "10eac45fdf884f4659b35c5cfc65fc476dd87a5e876960dac7cc1c9b01d3c629",
+    "bytes": 3251
+  },
+  "dashboard/test_vpn_control.py": {
+    "sha256": "48c042115d8f024e6e53afeba1197bf00fbf5691fbc40f7ef7574f18b2276b44",
+    "bytes": 8711
+  },
+  "dashboard/test_vpn_routing.py": {
+    "sha256": "e17739542912adbbe1a4e3371ea3771ac21afc8c70a6d254061e9dea80628352",
+    "bytes": 6332
+  },
+  "dashboard/vpn_controller.py": {
+    "sha256": "19f8454291aaa56f914e0bc7aec7aed59467f535805afdda654f91e24e08df39",
+    "bytes": 27944
+  },
+  "dashboard/vpn_routing.py": {
+    "sha256": "370c30c112d1e7b47af1fd9c5d0006907771272324699527849593824a3dcf3f",
+    "bytes": 9679
+  },
+  "dashboard/vpn_routing_refresh.py": {
+    "sha256": "e82601437e7c89b37bc6935d287565d59920d80ae3ef748a79b466f2206d1cf5",
+    "bytes": 1214
+  },
+  "deploy/pam/pi-dashboard": {
+    "sha256": "0e0902be04145bb2f2f34ab2ff65ce5acbf70714b707c8fb075fe0a84cc2de27",
+    "bytes": 55
+  },
+  "deploy/systemd/hardbox-img2txt-sync.service": {
+    "sha256": "048742c09ffcd96040f03024d3bbdf5c60e8e5cd11913b0253d9b91ec1e517c2",
+    "bytes": 704
+  },
+  "deploy/systemd/hardbox-vpn-dhcp.service": {
+    "sha256": "d807fd9ff5935beea3c9d4287dcf8cefffb6f1d31706c1a63c94053a1e16de95",
+    "bytes": 782
+  },
+  "deploy/systemd/hardbox-vpn-firewall.service": {
+    "sha256": "9d867949ffa477ff84eb35b86f956c05b5f2c8cde53a21e873793a01207b33c2",
+    "bytes": 381
+  },
+  "deploy/systemd/hardbox-vpn-hotspot.service": {
+    "sha256": "4af1465fc99a0d0c703c624bef58d9f41d060c8bc9d2fe58b10ca6047167212f",
+    "bytes": 498
+  },
+  "deploy/systemd/hardbox-vpn-routing-refresh.service": {
+    "sha256": "531e9e11c46829448355caeccac523ea88a1fc812c3b5015e93d03cc50eb7c56",
+    "bytes": 409
+  },
+  "deploy/systemd/hardbox-vpn-routing-refresh.timer": {
+    "sha256": "6c5ee56d9051dec80974d7490a3032a2bee70aaaf507c6c8f42d76252957ec62",
+    "bytes": 222
+  },
+  "deploy/systemd/hardbox-vpn.service": {
+    "sha256": "e711126eef3b2f0e16e888464890a5e5bcd7ebd7113cc067dcd51bcd33f3a1ad",
+    "bytes": 821
+  },
+  "deploy/systemd/img2txt.service": {
+    "sha256": "4d84d2c673b74180d032618bfa0e3fa4141fbeab0f86259c8d795030035ed563",
+    "bytes": 723
+  },
+  "deploy/systemd/pi-admin-controller.service": {
+    "sha256": "675cad141fb8a7fab168a3cabf19c6390f1ade97e2bf6a827b16e2f1b84e0387",
+    "bytes": 604
+  },
+  "deploy/systemd/pi-dashboard.service": {
+    "sha256": "74a1bc2d675c52aac5d5b44620d2aabc5cdcc6cae3636c45164f48e7f783d67b",
+    "bytes": 555
+  },
+  "deploy/systemd/pi-dashboard.service.d/10-admin.conf": {
+    "sha256": "e67fb0aac1e5c328eecccb0086dd07e07d6974f0cbb531cc00f00a7fa21078b9",
+    "bytes": 75
+  },
+  "deploy/systemd/pi-fan-controller.service": {
+    "sha256": "10346cf46b96363175365939ffacbff57aaeaf35e4925d1ce0285bd9b65d96d3",
+    "bytes": 657
+  },
+  "deploy/systemd/pi-vpn-controller.service": {
+    "sha256": "ef10be220543dbc8d55616d4aadcefe3f673defa46af3a327bd8ab1ca58c0f2f",
+    "bytes": 890
+  },
+  "docs/README.md": {
+    "sha256": "766325c1c0a7f7f53023b2d810fa49ae83e83d504c6f5e1c3d96fab10e4f79ff",
+    "bytes": 1790
+  },
+  "docs/dashboard.md": {
+    "sha256": "60456d42919715669c431f965b63a304339188a7263ebcf8e1014411769d7dd9",
+    "bytes": 18454
+  },
+  "docs/deployment.md": {
+    "sha256": "d3ffc19ea3a89fe93cad27eaafbc1cb74eb9c10e1d64c523a5d98715563adc42",
+    "bytes": 8685
+  },
+  "docs/gateway.md": {
+    "sha256": "c32cb39ade7500f1fd09277213c0aa4c8d2dfd2a8033657d71c6cb0cb714154f",
+    "bytes": 8471
+  },
+  "gateway/initialize_config.py": {
+    "sha256": "e1bb95452bb39f38bd3e5c1611295c1c6c397826c64f8eaed2a18d1c842924fd",
+    "bytes": 3163
+  },
+  "gateway/manage.py": {
+    "sha256": "670fc9f647f465ab689305aecddf9b1cfa59e7f9463f786dd2cebbf1cc8457c0",
+    "bytes": 2476
+  },
+  "gateway/release.json": {
+    "sha256": "8600b42314a1965b318f509b20c631d4a7e4f7003afaa837cb32a40b9eeaca78",
+    "bytes": 197
+  },
+  "gateway/templates/dnsmasq.conf": {
+    "sha256": "e0c8dfb27674053964e5e162a5b9cb75ad7a3b9440a76cbb023192bc0c5beb3c",
+    "bytes": 381
+  },
+  "gateway/templates/firewall.nft": {
+    "sha256": "c9f191ad978059c9c9f32859e3a11184e00d8515bffa6981007e8e2156becd32",
+    "bytes": 1057
+  },
+  "gateway/templates/wifi.example.json": {
+    "sha256": "92cd7901bf9cd622df246e8f583bace76238525551ef6bb38591ab0a61b3121a",
+    "bytes": 66
+  },
+  "gateway/templates/xray.example.json": {
+    "sha256": "f7daa1c9a2cdd39304d9517118fd4e0c32272bde8e7ff92bc5736aeb5c7d0107",
+    "bytes": 3568
+  },
+  "tools/check_publication.py": {
+    "sha256": "a80c4d71062b25729dcde4f3977323f6583f389d9be258e10e8c9370d4e26819",
+    "bytes": 7103
+  },
+  "tools/tests/test_initialize_config.py": {
+    "sha256": "309f4e1a7a1b430b866b31b2186e76aca43b0037858493d5ceb83747def45015",
+    "bytes": 2139
+  },
+  "tools/tests/test_publication.py": {
+    "sha256": "1ad379ebf514b38bbd1fe861d696bb69fadc32740f113fa3c81e1c8b3c793e74",
+    "bytes": 2329
+  }
+}

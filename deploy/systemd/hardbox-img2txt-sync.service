@@ -1,0 +1,26 @@
+[Unit]
+Description=Synchronize img2txt with the verified primary VPN key
+After=docker.service network-online.target hardbox-vpn.service
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=admin
+ExecStart=/usr/bin/python3 /opt/pi-dashboard/img2txt_vpn_sync.py
+TimeoutStartSec=180
+RuntimeDirectory=pi-img2txt
+RuntimeDirectoryMode=0750
+RuntimeDirectoryPreserve=yes
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/etc/hardbox-vpn/img2txt /var/lib/hardbox-vpn
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6

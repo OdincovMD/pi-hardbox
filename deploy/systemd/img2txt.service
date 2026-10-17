@@ -1,0 +1,21 @@
+[Unit]
+Description=Img2Txt Docker Compose Project (with synchronized Xray)
+After=docker.service network-online.target pi-vpn-controller.service
+Requires=docker.service
+Wants=network-online.target pi-vpn-controller.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=admin
+WorkingDirectory=/home/admin/python/img2txt
+ExecStartPre=+/usr/bin/systemctl start hardbox-img2txt-sync.service
+ExecStart=/usr/bin/docker compose -f docker-compose.yml -f docker-compose.xray.yml up -d --no-build --wait --wait-timeout 90
+ExecStop=/usr/bin/docker compose -f docker-compose.yml -f docker-compose.xray.yml stop --timeout 30
+TimeoutStartSec=300
+TimeoutStopSec=75
+Restart=on-failure
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target

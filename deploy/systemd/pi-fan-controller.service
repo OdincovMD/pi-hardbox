@@ -1,0 +1,29 @@
+[Unit]
+Description=PI Hardbox fan controller with thermal protection
+After=systemd-modules-load.service
+Conflicts=fancontrol.service
+
+[Service]
+Type=simple
+User=root
+Group=admin
+RuntimeDirectory=pi-fan
+RuntimeDirectoryMode=0750
+ExecStart=/usr/bin/python3 /opt/pi-dashboard/fan_controller.py
+ExecStopPost=/usr/bin/python3 /opt/pi-dashboard/fan_controller.py --failsafe
+Restart=always
+RestartSec=2
+TimeoutStopSec=5
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX
+UMask=0077
+MemoryMax=48M
+
+[Install]
+WantedBy=multi-user.target

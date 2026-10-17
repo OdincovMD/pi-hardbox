@@ -1,0 +1,26 @@
+table inet hardbox_vpn {
+    chain wifi_clients {
+        meta nfproto ipv6 counter drop
+        udp sport 68 udp dport 67 counter accept
+        ip saddr != 10.77.0.0/24 counter drop
+        ip daddr { 224.0.0.0/4, 255.255.255.255 } counter drop
+        meta l4proto { tcp, udp } th dport 53 meta mark set 0x01000000 tproxy ip to 127.0.0.1:12346 counter accept
+        meta l4proto { tcp, udp } meta mark set 0x01000000 tproxy ip to 127.0.0.1:12345 counter accept
+        counter drop
+    }
+    chain prerouting {
+        type filter hook prerouting priority mangle; policy accept;
+        iifname "wlan0" jump wifi_clients
+    }
+    chain input {
+        type filter hook input priority -10; policy accept;
+        iifname "wlan0" udp sport 68 udp dport 67 counter accept
+        iifname "wlan0" meta mark & 0x01000000 == 0x01000000 counter accept
+        iifname "wlan0" counter drop
+    }
+    chain forward {
+        type filter hook forward priority -10; policy accept;
+        iifname "wlan0" counter drop
+        oifname "wlan0" counter drop
+    }
+}

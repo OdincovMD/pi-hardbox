@@ -1,0 +1,14 @@
+[Unit]
+Description=Hardbox VPN Wi-Fi isolation and transparent routing
+Before=hardbox-vpn.service hardbox-vpn-hotspot.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/python3 /opt/hardbox-vpn/manage.py firewall-start
+ExecStop=/usr/bin/python3 /opt/hardbox-vpn/manage.py firewall-stop
+TimeoutStartSec=20
+TimeoutStopSec=25
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,17 @@
+[Unit]
+Description=Hardbox-VPN isolated Wi-Fi access point
+After=NetworkManager.service hardbox-vpn-firewall.service hardbox-vpn.service
+Requires=NetworkManager.service hardbox-vpn-firewall.service
+Wants=hardbox-vpn.service
+Before=hardbox-vpn-dhcp.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/nmcli --wait 35 connection up hardbox-vpn
+ExecStop=/usr/bin/nmcli --wait 15 connection down hardbox-vpn
+TimeoutStartSec=45
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

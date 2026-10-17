@@ -1,0 +1,30 @@
+[Unit]
+Description=PI Hardbox PAM authentication and server management
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Group=admin
+ExecStart=/usr/bin/python3 /opt/pi-dashboard/admin_controller.py
+Restart=on-failure
+RestartSec=3
+RuntimeDirectory=pi-admin
+RuntimeDirectoryMode=0750
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX
+CapabilityBoundingSet=
+MemoryMax=64M
+TasksMax=24
+LimitCORE=0
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

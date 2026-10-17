@@ -1,0 +1,29 @@
+[Unit]
+Description=DHCP for Hardbox VPN Wi-Fi clients
+After=hardbox-vpn-hotspot.service
+Requires=hardbox-vpn-hotspot.service
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/dnsmasq --keep-in-foreground --conf-file=/etc/hardbox-vpn/dnsmasq.conf
+Restart=on-failure
+RestartSec=3
+RuntimeDirectory=hardbox-vpn-dhcp
+RuntimeDirectoryMode=0750
+StateDirectory=hardbox-vpn
+StateDirectoryMode=0700
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK AF_PACKET
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_SETUID CAP_SETGID
+UMask=0077
+MemoryMax=48M
+
+[Install]
+WantedBy=multi-user.target

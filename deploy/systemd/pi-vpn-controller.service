@@ -1,0 +1,34 @@
+[Unit]
+Description=PI Hardbox VPN status and transactional key management
+After=NetworkManager.service hardbox-vpn.service
+Wants=hardbox-vpn.service
+
+[Service]
+Type=simple
+User=root
+Group=admin
+ExecStart=/usr/bin/python3 /opt/pi-dashboard/vpn_controller.py
+Restart=on-failure
+RestartSec=3
+RuntimeDirectory=pi-vpn
+RuntimeDirectoryMode=0750
+StateDirectory=hardbox-vpn
+StateDirectoryMode=0700
+ReadWritePaths=/etc/hardbox-vpn
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_CHOWN
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_CHOWN
+MemoryMax=128M
+TasksMax=48
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

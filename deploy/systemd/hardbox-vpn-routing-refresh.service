@@ -1,0 +1,18 @@
+[Unit]
+Description=Check Russian service domain lists
+After=pi-vpn-controller.service network-online.target
+Requires=pi-vpn-controller.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/pi-dashboard/vpn_routing_refresh.py
+User=root
+Group=admin
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+RestrictAddressFamilies=AF_UNIX
+TimeoutStartSec=260
+MemoryMax=32M
+UMask=0077
