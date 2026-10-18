@@ -319,6 +319,18 @@ HTML = r'''<!doctype html>
         <p id="vpn-status-note" class="fan-notice" role="status" aria-live="polite">Получаем данные контроллера…</p>
       </section>
 
+      <section class="vpn-sheet" aria-labelledby="subscription-title">
+        <div class="fan-heading"><h2 id="subscription-title">Подписка VPN</h2><span id="subscription-state" class="status-light" data-state="unknown">Ожидание данных</span></div>
+        <dl class="vpn-grid">
+          <div><dt>Автообновление</dt><dd id="subscription-schedule">—</dd></div>
+          <div><dt>Следующая проверка</dt><dd id="subscription-next">—</dd></div>
+          <div><dt>Последняя проверка</dt><dd id="subscription-last">—</dd></div>
+          <div><dt>Рабочие / проверенные подключения</dt><dd id="subscription-count">—</dd></div>
+          <div class="vpn-wide"><dt>Последний выбранный профиль</dt><dd id="subscription-selected">—</dd></div>
+        </dl>
+        <p id="subscription-note" class="fan-help">Проверка подписки ещё не выполнялась.</p>
+      </section>
+
       <section class="vpn-sheet" aria-labelledby="routing-title">
         <div class="fan-heading"><h2 id="routing-title">Куда идёт трафик</h2><span id="routing-mode">Ожидание правил</span></div>
         <p class="fan-help" id="routing-groups">Загружаем список российских сервисов…</p>
@@ -338,6 +350,22 @@ HTML = r'''<!doctype html>
         <details id="vpn-controls">
           <summary id="vpn-editor-title">Управление VPN и исключениями</summary>
           <p class="fan-help" id="vpn-editor-help">Войдите выше с паролем sudo пользователя admin. Изменения применяются с проверкой и возвратом прежних настроек при ошибке. Возможен короткий перерыв соединения.</p>
+          <form id="subscription-form" novalidate aria-describedby="subscription-help vpn-feedback">
+            <h3>Автоматическое обновление</h3>
+            <p id="subscription-help" class="fan-help">Список загружается по HTTPS. Выбираем доступный профиль с наименьшей медианой трёх HTTPS-запросов; также проверяем доступность LLM API для img2txt. Страна и смена IP не влияют на выбор. При ошибке сохраняем действующий VPN.</p>
+            <div class="form-actions routing-tools"><button id="subscription-load" type="button" disabled>Загрузить настройки подписки</button><button id="subscription-refresh" type="button" disabled>Проверить подписку сейчас</button></div>
+            <fieldset id="subscription-settings" disabled>
+              <legend>Настройки подписки</legend>
+              <label><input id="subscription-enabled" type="checkbox"> Обновлять автоматически</label>
+              <label for="subscription-interval">Интервал проверки, часов</label>
+              <input id="subscription-interval" type="number" min="1" max="168" step="1" value="6" required aria-describedby="subscription-help vpn-feedback">
+              <label for="subscription-url">HTTPS-ссылка подписки</label>
+              <div class="fan-auth"><input id="subscription-url" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="2048" placeholder="https://…" aria-describedby="subscription-url-help vpn-feedback"><button type="button" data-toggle-secret="subscription-url" aria-controls="subscription-url" aria-pressed="false">Показать</button></div>
+              <p id="subscription-url-help" class="fan-help">Ссылка хранится только на сервере и не выдаётся обратно. Пустое поле сохраняет прежнюю ссылку.</p>
+              <div class="form-actions"><button id="subscription-save" class="fan-primary" type="submit">Сохранить и проверить</button></div>
+            </fieldset>
+            <p id="subscription-draft" class="fan-help">Настройки доступны после входа и загрузки. Ручная проверка использует сохранённую ссылку.</p>
+          </form>
           <form id="routing-form" novalidate aria-describedby="routing-help vpn-feedback">
             <h3>Мои исключения</h3>
             <p id="routing-help" class="fan-help">Один домен на строку, без https:// и пути. Правило действует и для поддоменов. Ваш список «Через VPN» имеет приоритет над прямым выходом и базовыми исключениями. До 50 доменов в каждом списке.</p>
@@ -361,7 +389,7 @@ HTML = r'''<!doctype html>
               <legend>Новый ключ подключения</legend>
               <label for="vpn-uri">Полная ссылка VLESS</label>
               <div class="fan-auth"><input id="vpn-uri" type="password" autocomplete="off" spellcheck="false" maxlength="8192" placeholder="vless://…" aria-describedby="vpn-uri-help vpn-feedback" required><button type="button" data-toggle-secret="vpn-uri" aria-controls="vpn-uri" aria-pressed="false">Показать</button></div>
-              <p class="fan-help" id="vpn-uri-help">Поддерживается VLESS + REALITY + TCP. Ключ не отображается в статусе и не сохраняется в браузере.</p>
+              <p class="fan-help" id="vpn-uri-help">Поддерживается VLESS + REALITY + TCP. Ключ не отображается в статусе и не сохраняется в браузере. Чтобы оставить ручной ключ, отключите автообновление подписки.</p>
               <button id="vpn-apply" class="fan-primary" type="submit">Проверить и применить</button>
             </fieldset>
           </form>
@@ -375,7 +403,7 @@ HTML = r'''<!doctype html>
       <span id="updated" aria-live="polite">Ожидание телеметрии</span>
     </footer>
   </main>
-  <script src="/app.js?v=img2txt1" defer></script>
+  <script src="/app.js?v=subscription1" defer></script>
 </body>
 </html>
 '''
@@ -818,7 +846,7 @@ body[data-state=offline] .core-grid { opacity: .65; }
 .fan-panel label { display: block; font-size: .9rem; line-height: 1.5; }
 .fan-panel fieldset { border: 0; margin: 1rem 0 0; padding: 0; min-width: 0; }
 .fan-panel legend { font-weight: 700; padding: 0 0 .5rem; }
-.fan-panel button, dialog button, .fan-panel input[type=password], .fan-panel input[type=text] { min-height: var(--control-height); margin: 0; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: .65rem 1rem; font: inherit; line-height: 1.35; color: var(--ink); background: var(--paper-bright); }
+.fan-panel button, dialog button, .fan-panel input[type=password], .fan-panel input[type=text], .fan-panel input[type=number] { min-height: var(--control-height); margin: 0; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: .65rem 1rem; font: inherit; line-height: 1.35; color: var(--ink); background: var(--paper-bright); }
 .fan-panel button, dialog button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; cursor: pointer; font-size: .9rem; font-weight: 700; text-align: center; overflow-wrap: anywhere; }
 .fan-panel button:hover, dialog button:hover { border-color: var(--ink); background: var(--paper); }
 .fan-panel button:active, dialog button:active { transform: translateY(1px); }
@@ -829,6 +857,10 @@ body[data-state=offline] .core-grid { opacity: .65; }
 .fan-panel :focus-visible, dialog :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 .fan-panel [aria-invalid=true] { border-color: var(--raspberry); }
 .fan-panel input { accent-color: var(--raspberry); }
+#subscription-settings > label { display: block; margin: 16px 0 var(--control-gap); }
+#subscription-settings > label:first-of-type { display: flex; align-items: center; gap: 10px; min-height: var(--control-height); margin-top: 0; }
+#subscription-interval { display: block; width: min(100%,12rem); box-sizing: border-box; }
+#subscription-enabled { width: 20px; height: 20px; flex: 0 0 20px; }
 .fan-auth { display: grid; grid-template-columns: minmax(0,1fr) 6.5rem; align-items: stretch; margin-top: var(--control-gap); gap: var(--control-gap); }
 .fan-auth input { min-width: 0; width: 100%; }
 .auth-panel .fan-auth { grid-template-columns: minmax(0,1fr) 6.5rem 7rem; }
@@ -931,15 +963,29 @@ JS = r'''(() => {
   let rulesLoading = false;
   let rulesAbort = null;
   let rulesSequence = 0;
+  let subscriptionRevision = null;
+  let subscriptionLoaded = false;
+  let subscriptionDirty = false;
+  let subscriptionLoading = false;
+  let subscriptionConfigured = false;
+  let subscriptionAbort = null;
+  let subscriptionSequence = 0;
 
   function vpnControls() {
-    const blocked = !vpnAvailable || vpnBusy || vpnUpdating || rulesLoading || !authenticated || rebootPending;
+    const blocked = !vpnAvailable || vpnBusy || vpnUpdating || rulesLoading || subscriptionLoading || !authenticated || rebootPending;
     byId("vpn-settings").disabled = blocked;
     byId("routing-settings").disabled = blocked || !rulesLoaded;
     byId("routing-apply").disabled = !rulesDirty;
     byId("routing-load").disabled = blocked;
     byId("routing-load").textContent = rulesLoading ? "Загружаем…" : rulesDirty ? "Загрузить списки заново (заменит черновик)" : "Загрузить мои исключения";
     byId("routing-refresh").disabled = blocked;
+    byId("subscription-settings").disabled = blocked || !subscriptionLoaded;
+    byId("subscription-load").disabled = blocked;
+    byId("subscription-load").textContent = subscriptionLoading ? "Загружаем…" : subscriptionDirty ? "Загрузить заново (заменит черновик)" : "Загрузить настройки подписки";
+    byId("subscription-refresh").disabled = blocked || !subscriptionLoaded || !subscriptionConfigured || subscriptionDirty;
+    byId("subscription-save").disabled = !subscriptionDirty;
+    byId("subscription-save").textContent = byId("subscription-enabled").checked ? "Сохранить и проверить" : "Сохранить без автообновления";
+    byId("subscription-form").setAttribute("aria-busy", String(vpnBusy || subscriptionLoading));
     byId("vpn-form").setAttribute("aria-busy", String(vpnBusy));
     byId("routing-form").setAttribute("aria-busy", String(vpnBusy || rulesLoading));
     byId("vpn-controls").querySelectorAll("[data-toggle-secret]").forEach(button => { button.disabled = vpnBusy; });
@@ -968,6 +1014,16 @@ JS = r'''(() => {
     text("vpn-service", data.service_running ? "Работает" : "Не работает");
     text("vpn-protection", data.protection_active ? "Включена" : "Требуется проверка");
     text("vpn-key-time", localDate(data.key_updated_at));
+    const sub = data.subscription;
+    const subState = !vpnAvailable || !sub ? "unknown" : sub.state === "checking" ? "warn" : sub.state === "error" ? "off" : sub.state === "success" ? "on" : "unknown";
+    byId("subscription-state").dataset.state = subState;
+    text("subscription-state", !sub ? "Нет данных" : sub.state === "checking" ? "Проверяем" : sub.state === "error" ? "Ошибка обновления" : !sub.enabled ? "Автообновление выключено" : sub.state === "success" ? "Обновлено" : "Ожидает проверки");
+    text("subscription-schedule", sub?.enabled ? `Каждые ${sub.interval_hours} ч` : "Выключено");
+    text("subscription-next", localDate(sub?.next_check_at));
+    text("subscription-last", localDate(sub?.last_check_at));
+    text("subscription-count", Number.isInteger(sub?.tested) ? `${sub.working || 0} / ${sub.tested}${sub.state === "checking" ? ` · всего ${sub.compatible || 0}` : ""}` : "—");
+    text("subscription-selected", Number.isFinite(sub?.latency_ms) ? `Профиль №${sub.selected_index} · ${sub.latency_ms} мс · ${localDate(sub.last_success_at)}` : "Ещё не выбирали автоматически");
+    text("subscription-note", sub?.message || "Проверка подписки ещё не выполнялась.");
     text("vpn-status-note", !vpnAvailable ? "Контроллер временно недоступен. Управление заблокировано до восстановления связи." : vpnUpdating ? "Проверяются или применяются настройки VPN. Wi-Fi-настройки сохраняются." : "Пароли, ключи, адреса сервера и данные отдельных устройств здесь не публикуются.");
     const routes = data.routing;
     text("routing-mode", routes?.enabled ? "По умолчанию — VPN" : "Исключения не установлены");
@@ -1001,6 +1057,8 @@ JS = r'''(() => {
         vpnControls();
         text("connection", "Нет связи");
         text("vpn-status-note", "Нет связи с сайтом · показаны последние измерения. Повторяем подключение.");
+        byId("subscription-state").dataset.state = "unknown";
+        text("subscription-state", "Нет свежих данных");
         document.body.dataset.state = "offline";
       }
     } finally {
@@ -1037,6 +1095,7 @@ JS = r'''(() => {
           window.clearTimeout(vpnTimer);
           refreshVpn();
           if (vpnAction === "rules" && result.job.state === "success") loadRules(false);
+          if (vpnAction === "subscription") loadSubscription(false);
           return;
         }
       }
@@ -1172,6 +1231,92 @@ JS = r'''(() => {
   }
   byId("routing-form").addEventListener("submit", event => { event.preventDefault(); submitRules(); });
   byId("routing-refresh").addEventListener("click", () => submitRules(true));
+
+  function clearSubscriptionSecret() {
+    byId("subscription-url").value = ""; byId("subscription-url").type = "password";
+    const toggle = document.querySelector('[data-toggle-secret="subscription-url"]');
+    toggle.textContent = "Показать"; toggle.setAttribute("aria-pressed", "false");
+  }
+
+  async function loadSubscription(announce = true) {
+    if (vpnBusy || subscriptionLoading || !authenticated) return;
+    subscriptionAbort?.abort();
+    const request = new AbortController(); subscriptionAbort = request;
+    const sequence = ++subscriptionSequence;
+    const timeout = window.setTimeout(() => request.abort(), 7000);
+    subscriptionLoading = true; vpnControls();
+    try {
+      const response = await fetch("/api/vpn/subscription", {cache: "no-store", signal: request.signal});
+      const result = await response.json();
+      if (sequence !== subscriptionSequence) return;
+      if (!response.ok) {
+        if (response.status === 401) requireLogin();
+        vpnFeedback(result.error || "Не удалось загрузить настройки подписки", true); return;
+      }
+      const sub = result.subscription;
+      subscriptionRevision = sub.revision; subscriptionConfigured = sub.configured;
+      subscriptionLoaded = true; subscriptionDirty = false;
+      byId("subscription-enabled").checked = sub.enabled;
+      byId("subscription-interval").value = sub.interval_hours;
+      clearSubscriptionSecret();
+      byId("subscription-url").placeholder = sub.configured ? "Ссылка сохранена · пустое поле её сохранит" : "https://…";
+      ["subscription-url", "subscription-interval"].forEach(id => byId(id).removeAttribute("aria-invalid"));
+      text("subscription-draft", "Настройки загружены. Ручная проверка использует сохранённую ссылку; сначала сохраните изменения.");
+      if (announce) vpnFeedback("Настройки подписки загружены. Сохранённая ссылка скрыта и не передаётся в браузер.");
+    } catch (_) {
+      if (sequence === subscriptionSequence) vpnFeedback("Не удалось загрузить настройки подписки. Черновик сохранён; проверьте связь и повторите загрузку.", true);
+    } finally {
+      window.clearTimeout(timeout);
+      if (sequence === subscriptionSequence) { subscriptionLoading = false; vpnControls(); }
+    }
+  }
+  byId("subscription-load").addEventListener("click", () => loadSubscription());
+  for (const id of ["subscription-enabled", "subscription-interval", "subscription-url"]) byId(id).addEventListener("input", () => {
+    subscriptionDirty = true; byId(id).removeAttribute("aria-invalid");
+    text("subscription-draft", "Есть несохранённые изменения. Сохраните их перед ручной проверкой подписки."); vpnControls();
+  });
+
+  async function submitSubscription(refresh = false) {
+    if (vpnBusy || vpnUpdating || subscriptionLoading || !vpnAvailable || !authenticated || !subscriptionLoaded || (refresh && subscriptionDirty)) return;
+    const id = crypto.randomUUID();
+    const payload = {request_id: id};
+    if (!refresh) {
+      payload.enabled = byId("subscription-enabled").checked;
+      payload.interval_hours = Number(byId("subscription-interval").value);
+      payload.url = byId("subscription-url").value.trim();
+      payload.revision = subscriptionRevision;
+      let invalid = "";
+      if (!Number.isInteger(payload.interval_hours) || payload.interval_hours < 1 || payload.interval_hours > 168) invalid = "subscription-interval";
+      else if ((payload.enabled && !subscriptionConfigured && !payload.url) || (payload.url && !/^https:\/\//.test(payload.url))) invalid = "subscription-url";
+      if (invalid) {
+        byId(invalid).setAttribute("aria-invalid", "true"); byId(invalid).focus();
+        vpnFeedback(invalid === "subscription-interval" ? "Укажите целое число от 1 до 168 часов." : "Введите полную HTTPS-ссылку подписки.", true); return;
+      }
+    }
+    vpnAction = "subscription"; vpnBusy = true; vpnControls();
+    vpnFeedback(refresh ? "Запрашиваем проверку сохранённой подписки…" : "Сохраняем настройки подписки…");
+    const request = new AbortController(); const timeout = window.setTimeout(() => request.abort(), 7000);
+    try {
+      const response = await fetch(refresh ? "/api/vpn/subscription/refresh" : "/api/vpn/subscription", {
+        method: "POST", cache: "no-store", signal: request.signal, headers: {"Content-Type": "application/json"}, body: JSON.stringify(payload),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        vpnBusy = false;
+        if (response.status === 401) requireLogin();
+        else if (response.status === 400 && !refresh) { byId("subscription-url").setAttribute("aria-invalid", "true"); byId("subscription-url").focus(); }
+        vpnFeedback(result.error || "Настройки не приняты. Черновик сохранён.", true); vpnControls(); return;
+      }
+      if (!refresh) { clearSubscriptionSecret(); subscriptionDirty = false; }
+      vpnFeedback(result.job.message);
+    } catch (_) {
+      vpnFeedback("Нет подтверждения приёма настроек подписки. Проверяем результат; повторная отправка не требуется.");
+    } finally { window.clearTimeout(timeout); }
+    vpnJobDeadline = Date.now() + 1200000;
+    window.clearTimeout(vpnJobTimer); pollVpnJob(id);
+  }
+  byId("subscription-form").addEventListener("submit", event => { event.preventDefault(); submitSubscription(); });
+  byId("subscription-refresh").addEventListener("click", () => submitSubscription(true));
 
   function uptime(seconds) {
     let left = Math.max(0, Math.floor(Number(seconds) || 0));
@@ -1478,6 +1623,9 @@ JS = r'''(() => {
       if (!response.ok) throw new Error();
       authenticated = false;
       rulesAbort?.abort(); rulesSequence++; rulesLoading = false; rulesLoaded = false; rulesDirty = false; rulesRevision = null;
+      subscriptionAbort?.abort(); subscriptionSequence++; subscriptionLoading = false; subscriptionLoaded = false; subscriptionDirty = false; subscriptionRevision = null; subscriptionConfigured = false;
+      clearSubscriptionSecret(); byId("subscription-enabled").checked = false; byId("subscription-interval").value = 6;
+      text("subscription-draft", "Выполнен выход. Черновики удалены из памяти страницы.");
       ["routing-direct", "routing-vpn", "vpn-uri", "auth-password"].forEach(id => { byId(id).value = ""; });
       text("routing-draft", "Выполнен выход. Черновики удалены из памяти страницы.");
       text("auth-feedback", "Вы вышли из управления. Сайт, VPN и вентилятор продолжают работать.");
@@ -2021,7 +2169,7 @@ class Handler(BaseHTTPRequestHandler):
         self.close_connection = True
         path = urlsplit(self.path).path
         auth_path = path in {"/api/auth/login", "/api/auth/logout"}
-        if path not in {"/api/fan", "/api/vpn/config", "/api/vpn/rules", "/api/vpn/rules/refresh", "/api/admin/reboot"} and not auth_path:
+        if path not in {"/api/fan", "/api/vpn/config", "/api/vpn/rules", "/api/vpn/rules/refresh", "/api/vpn/subscription", "/api/vpn/subscription/refresh", "/api/admin/reboot"} and not auth_path:
             self._json(404, {"error": "Неизвестный адрес"})
             return
         if not (self._origin_allowed() if auth_path else self._authorized()):
@@ -2067,6 +2215,23 @@ class Handler(BaseHTTPRequestHandler):
                                {"Set-Cookie": SESSION_COOKIE + "=" + result["session"] + "; Path=/; Max-Age=600; Secure; HttpOnly; SameSite=Strict"})
                 else:
                     self._json(202, {"reboot": result["reboot"]})
+                return
+            if path in {"/api/vpn/subscription", "/api/vpn/subscription/refresh"}:
+                if not isinstance(data, dict) or not isinstance(data.get("request_id"), str):
+                    raise ValueError()
+                payload = {"operation": "set-subscription" if path == "/api/vpn/subscription" else "refresh-subscription", "request_id": data["request_id"]}
+                if path == "/api/vpn/subscription":
+                    payload.update(enabled=data.get("enabled"), interval_hours=data.get("interval_hours"), url=data.get("url", ""), revision=data.get("revision"))
+                try:
+                    result = _vpn_request(payload)
+                except (OSError, ValueError):
+                    self._json(503, {"error": "Контроллер VPN недоступен. Проверьте статус перед повтором."})
+                    return
+                if not result.get("ok"):
+                    self._json(409 if result.get("code") in {"busy", "conflict"} else 400 if result.get("code") == "invalid" else 503,
+                               {"error": result.get("error", "Не удалось принять настройки подписки")})
+                    return
+                self._json(202, {"job": result["job"]})
                 return
             if path in {"/api/vpn/rules", "/api/vpn/rules/refresh"}:
                 if not isinstance(data, dict) or not isinstance(data.get("request_id"), str):
@@ -2170,6 +2335,14 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(200, {"job": result["job"]})
             except (OSError, ValueError, KeyError):
                 self._json(503, {"error": "Не удалось получить результат операции"})
+        elif path == "/api/vpn/subscription":
+            if not self._authorized():
+                return
+            try:
+                result = _vpn_request({"operation": "subscription"})
+                self._json(200, {"subscription": result["subscription"]})
+            except (OSError, ValueError, KeyError):
+                self._json(503, {"error": "Не удалось загрузить настройки подписки"})
         elif path == "/api/vpn/rules":
             if not self._authorized():
                 return

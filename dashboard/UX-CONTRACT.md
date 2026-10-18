@@ -109,3 +109,24 @@ The LLM readiness light comes from a cached, background GET /models in img2txt.
 It checks provider authorization and configured model presence without generation
 or patient data. Only safe state/timestamp metadata leaves the service. A failed
 provider API key is separate from VLESS and does not reject a valid VPN rotation.
+
+
+## Subscription editor
+
+The VPN route owns the subscription status and owner form. Flat description
+lists and the shared status-light show schedule, next/last checks, working/tested
+counts and the last selected ordinal with median HTTPS time. No exit addresses,
+profile names, source links or secrets appear in public or protected readbacks.
+
+Explicit protected load enables the native checkbox, integer-hours field and
+masked write-only HTTPS input. Blank preserves the saved URL; the server only
+returns configured/revision. The shared reveal recipe applies. Dirty reload
+names draft replacement; public polling never changes fields. Manual check uses
+saved settings and is disabled while dirty. Save immediately checks an enabled
+subscription; disable saves without network changes. Validation/conflict/expiry
+preserve drafts and focus correction; accepted writes clear/mask the secret.
+Uncertain writes poll the original ID without resubmission. Late protected reads
+are invalidated on logout, which clears/masks URL and resets the draft. All VPN
+mutations share the existing busy guard; long candidate checks show progress.
+Results distinguish update failure from the still-running previous connection.
+No new navigation, modal, browser storage or login control is introduced.

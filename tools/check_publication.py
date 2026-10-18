@@ -6,6 +6,7 @@ import os
 import re
 import subprocess
 from pathlib import Path, PurePosixPath
+from urllib.parse import urlsplit
 
 PATTERNS = (
     ('private-key', re.compile(rb'-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----')),
@@ -13,11 +14,12 @@ PATTERNS = (
     ('github-token', re.compile(rb'(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})')),
     ('aws-key', re.compile(rb'(?:AKIA|ASIA)[A-Z0-9]{16}')),
     ('credential-url', re.compile(rb'https?://[^\s/@:]+:[^\s/@]+@')),
+    ('subscription-url', re.compile(rb'https://[^\s/"\x27<>]+/(?:sub|subscription)/[A-Za-z0-9_-]{8,}')),
 )
 VLESS = re.compile(rb'vless://([0-9a-fA-F-]{36})@')
 FIXTURE_IDS = {b'00000000-0000-0000-0000-000000000000',
                b'12345678-1234-4234-8234-123456789abc'}
-PRIVATE_NAMES = {'xray.json', 'wifi.json', 'config.json', 'fan.token', 'dhcp.leases'}
+PRIVATE_NAMES = {'xray.json', 'wifi.json', 'config.json', 'fan.token', 'dhcp.leases', 'subscription.json', 'subscription-status.json'}
 PRIVATE_PARTS = {'backups', 'private', 'state', '__pycache__', '.gitnexus'}
 
 
@@ -90,7 +92,7 @@ def installed_secrets():
     if os.geteuid() != 0:
         raise ValueError('Root is required for installed credential comparison')
     values = set()
-    sensitive = {'id', 'password', 'publicKey', 'privateKey', 'shortId', 'psk', 'token', 'api_key', 'apiKey'}
+    sensitive = {'id', 'password', 'publicKey', 'privateKey', 'shortId', 'psk', 'token', 'api_key', 'apiKey', 'url'}
     def collect(obj):
         if isinstance(obj, dict):
             if obj.get('protocol') == 'vless':
@@ -103,6 +105,10 @@ def installed_secrets():
             for key, value in obj.items():
                 if key in sensitive and isinstance(value, str) and len(value) >= 8:
                     values.add(value.encode())
+                    if key == 'url':
+                        identifier = urlsplit(value).path.rstrip('/').rsplit('/', 1)[-1]
+                        if len(identifier) >= 8:
+                            values.add(identifier.encode())
                 else:
                     collect(value)
         elif isinstance(obj, list):

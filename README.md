@@ -7,6 +7,8 @@ VLESS/REALITY. Python использует стандартную библиот
 - **Дашборд:** телеметрия, графики отдельных ядер, проекты и их доступность.
 - **VPN:** состояние Wi-Fi, проверка и замена VLESS-ключа, прямые исключения
   для выбранных российских сервисов, обновление списков доменов.
+  Автообновление base64-подписки выбирает рабочий профиль по задержке; ссылка
+  и интервал настраиваются после входа.
 - **Управление:** охлаждение с температурной защитой, статусы автозапуска,
   подтверждаемая перезагрузка. Вход через PAM-пароль системного admin.
 - **img2txt:** синхронизация с проверенным основным ключом и перезапуск
@@ -35,7 +37,7 @@ tools/              проверки публикации и тесты этих
 
 ```bash
 cd dashboard
-python3 -m unittest -q test_fan_control.py test_cpu_telemetry.py test_vpn_control.py test_vpn_routing.py test_admin_control.py test_project_status.py test_img2txt_sync.py test_img2txt_llm_health.py
+python3 -m unittest -q test_fan_control.py test_cpu_telemetry.py test_vpn_control.py test_vpn_routing.py test_admin_control.py test_project_status.py test_img2txt_sync.py test_img2txt_llm_health.py test_vpn_subscription.py
 cd ..
 python3 -m unittest discover -s tools/tests -v
 python3 tools/check_publication.py --staged

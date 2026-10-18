@@ -17,6 +17,12 @@ class PublicationTests(unittest.TestCase):
         self.assertIn('installed-secret', checker.findings('asset.png', b'prefix-secret-suffix', [b'secret']))
         self.assertFalse(checker.findings('gateway/templates/wifi.example.json', b'{"password":"CHANGE_ME"}'))
 
+    def test_subscription_settings_and_token_urls_are_private(self):
+        self.assertIn('private-file', checker.findings('subscription.json', b'{}'))
+        self.assertIn('private-file', checker.findings('subscription-status.json', b'{}'))
+        url = ('https://keys.example/' + 'sub/' + 'fake' * 4).encode()
+        self.assertIn('subscription-url', checker.findings('settings.py', url))
+
     def test_index_is_checked_even_if_working_copy_was_cleaned(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

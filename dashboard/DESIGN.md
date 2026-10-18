@@ -139,3 +139,10 @@ there is no new login, palette, control, or public application API link.
 The img2txt LLM API light names missing/invalid provider credentials separately
 from VPN state. Overall attention remains visible while generation is unavailable,
 even when containers, HTTP, boot enablement and VPN are all green.
+
+
+Subscription monitoring extends the VPN description list and shared static lamp.
+The existing owner disclosure adds one native form using the same action grid,
+masked secret/reveal row, checkbox and labeled number input. Its 44px control
+height, 64px utility rows, typography, colors and focus come from the canonical
+runtime recipes. Narrow screens stack the same actions without new tokens.

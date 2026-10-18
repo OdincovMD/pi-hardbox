@@ -8,8 +8,8 @@
     "bytes": 67
   },
   ".gitignore": {
-    "sha256": "f1831f9e9075a13d7f5dc181b08824aa02d4bbba028e02983bd51557e6ae1c0f",
-    "bytes": 615
+    "sha256": "d6638418780717ddb61d46d15289909c6a7b20cb35c2eea1ab594ee21fe6755e",
+    "bytes": 658
   },
   "AGENTS.md": {
     "sha256": "7c4f29285b8de5e7882e69432b7b7d78d19fa65f4c7e1a3677501a4742fede0f",
@@ -20,20 +20,20 @@
     "bytes": 2839
   },
   "README.md": {
-    "sha256": "a81d3f765c1a01e64766575c39e175467d9242775e0e08c0a4b77cb63f10bfb6",
-    "bytes": 3530
+    "sha256": "17a452127a14a4200ef3f250a27b1ac1180b27e74333bc384e7e13e35f07fc5a",
+    "bytes": 3765
   },
   "SECURITY.md": {
-    "sha256": "23dd25ebec03d7a6d35244ee879767ecce2bf9c7a7cb24eac2f513d114e1f4b5",
-    "bytes": 2907
+    "sha256": "355f8e3be54161c4ae9e982032f52d6408c5938fad07d27f77adb50d7632fca3",
+    "bytes": 3013
   },
   "dashboard/DESIGN.md": {
-    "sha256": "1ed0d6ea3269b3f1b6897b09198b6e09b8718936eeb457f624cd148b07f7db38",
-    "bytes": 9585
+    "sha256": "d50e6fb56720d88afeb08c0088d7b1c679902ff54bb0f941f6be560f09bae592",
+    "bytes": 9980
   },
   "dashboard/UX-CONTRACT.md": {
-    "sha256": "1f33e56310102e91c3de514e289b4c7a980931596d9c71f720809c7b0c85705c",
-    "bytes": 6690
+    "sha256": "580185d0049ef58c47e0d3be629d42b31b8a632c2eff4b6a91ec1941cc64fc39",
+    "bytes": 7974
   },
   "dashboard/admin_controller.py": {
     "sha256": "a4cf3c52037b9d692295bc5153c0c846dfccdc6ee7fa460b3fd044487b2fb9de",
@@ -64,8 +64,8 @@
     "bytes": 1577459
   },
   "dashboard/dashboard.py": {
-    "sha256": "b2c4cce227a9093c71a44b5427611839659ad602e235cbc0772611453dfd492a",
-    "bytes": 125419
+    "sha256": "00f6feacda05d1d40f118ed21828c46b3c9bafef09673e88890aa415d5228b62",
+    "bytes": 140495
   },
   "dashboard/fan_controller.py": {
     "sha256": "831cb80b326b8e7ebb332b25d75ef3e4a8267f6cf3c88c7086bbc1fd97cd11ec",
@@ -115,9 +115,13 @@
     "sha256": "e17739542912adbbe1a4e3371ea3771ac21afc8c70a6d254061e9dea80628352",
     "bytes": 6332
   },
+  "dashboard/test_vpn_subscription.py": {
+    "sha256": "8fd7dc00514d44c5e974aeff0ead0795454ec54458f5606d5733d7e56e0de227",
+    "bytes": 12483
+  },
   "dashboard/vpn_controller.py": {
-    "sha256": "19f8454291aaa56f914e0bc7aec7aed59467f535805afdda654f91e24e08df39",
-    "bytes": 27944
+    "sha256": "3607a5f23f0aba506305da7cbed3949397ad1d74f5c678c168ab4b7586d8d37d",
+    "bytes": 37599
   },
   "dashboard/vpn_routing.py": {
     "sha256": "370c30c112d1e7b47af1fd9c5d0006907771272324699527849593824a3dcf3f",
@@ -126,6 +130,10 @@
   "dashboard/vpn_routing_refresh.py": {
     "sha256": "e82601437e7c89b37bc6935d287565d59920d80ae3ef748a79b466f2206d1cf5",
     "bytes": 1214
+  },
+  "dashboard/vpn_subscription.py": {
+    "sha256": "a73ac394fa28ff450470f0bbd523fe6d87f2df112b785757cea382602d19724c",
+    "bytes": 8093
   },
   "deploy/pam/pi-dashboard": {
     "sha256": "0e0902be04145bb2f2f34ab2ff65ce5acbf70714b707c8fb075fe0a84cc2de27",
@@ -188,12 +196,12 @@
     "bytes": 1790
   },
   "docs/dashboard.md": {
-    "sha256": "60456d42919715669c431f965b63a304339188a7263ebcf8e1014411769d7dd9",
-    "bytes": 18454
+    "sha256": "3c2a5278cba70a53ad4de34b9d6636a7e3072daa2f7935b754508d8e63b31c00",
+    "bytes": 24098
   },
   "docs/deployment.md": {
-    "sha256": "d3ffc19ea3a89fe93cad27eaafbc1cb74eb9c10e1d64c523a5d98715563adc42",
-    "bytes": 8685
+    "sha256": "514898bdc9d9c04f33ebdc79bbac5c35e334b4cdba7a43b7b6ba2d980e5552c2",
+    "bytes": 9670
   },
   "docs/gateway.md": {
     "sha256": "c32cb39ade7500f1fd09277213c0aa4c8d2dfd2a8033657d71c6cb0cb714154f",
@@ -228,15 +236,15 @@
     "bytes": 3568
   },
   "tools/check_publication.py": {
-    "sha256": "a80c4d71062b25729dcde4f3977323f6583f389d9be258e10e8c9370d4e26819",
-    "bytes": 7103
+    "sha256": "8ee1f33574fa93cb039e14de6404d25cba11dde2b11d5f565491deca109af9f8",
+    "bytes": 7533
   },
   "tools/tests/test_initialize_config.py": {
     "sha256": "309f4e1a7a1b430b866b31b2186e76aca43b0037858493d5ceb83747def45015",
     "bytes": 2139
   },
   "tools/tests/test_publication.py": {
-    "sha256": "1ad379ebf514b38bbd1fe861d696bb69fadc32740f113fa3c81e1c8b3c793e74",
-    "bytes": 2329
+    "sha256": "bbd6e080c158a1f920f833d13d9f72302769807196727261318b35ab4b6c288d",
+    "bytes": 2725
   }
 }

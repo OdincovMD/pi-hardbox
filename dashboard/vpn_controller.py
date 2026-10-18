@@ -14,6 +14,7 @@ import secrets
 import signal
 import socket
 import socketserver
+import statistics
 import subprocess
 import threading
 import time
@@ -23,10 +24,12 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
 import vpn_routing as routing
+import vpn_subscription as subscription
 
 CONFIG = Path("/etc/hardbox-vpn/xray.json")
 IMG2TXT_CONFIG = Path("/etc/hardbox-vpn/img2txt/xray.json")
 STATE = Path("/var/lib/hardbox-vpn")
+SUBSCRIPTION = Path("/etc/hardbox-vpn/subscription.json")
 SOCKET = "/run/pi-vpn/control.sock"
 XRAY = "/usr/local/lib/hardbox-vpn/xray"
 BUSY = {"checking", "applying", "restoring"}
@@ -156,7 +159,7 @@ def sync_img2txt():
 
 class Controller:
     def __init__(self):
-        self.lock = threading.Lock()
+        self.lock = threading.RLock()
         self.job = None
         self.jobs = {}
         self.data = {"available": True, "online": None, "checked_at": None, "updated_at": None}
@@ -164,6 +167,21 @@ class Controller:
         self.previous_bytes = None
         self.pending = STATE / "dashboard-update-pending.json"
         self.good = STATE / "dashboard-last-good.json"
+        self.subscription = {"enabled": False, "url": "", "interval_hours": 6, "revision": str(uuid.uuid4())}
+        self.subscription_status = {"state": "idle"}
+        self.subscription_active = False
+        try:
+            saved = json.loads(SUBSCRIPTION.read_bytes())
+            self.subscription.update(subscription.settings({}, saved), revision=saved["revision"])
+        except (OSError, ValueError, KeyError, TypeError):
+            pass
+        try:
+            saved = json.loads((STATE / "subscription-status.json").read_bytes())
+            self.subscription_status.update({key: saved[key] for key in subscription.PUBLIC_FIELDS if key in saved})
+            if self.subscription_status.get("state") == "checking":
+                self.subscription_status.update(state="idle", next_check_at=None)
+        except (OSError, ValueError, TypeError):
+            pass
 
     def recover(self):
         if self.pending.exists():
@@ -177,7 +195,8 @@ class Controller:
     def snapshot(self):
         with self.lock:
             result = copy.deepcopy(self.data)
-            result["updating"] = bool(self.job and self.job["state"] in BUSY)
+            result["updating"] = self.subscription_active or bool(self.job and self.job["state"] in BUSY)
+            result["subscription"] = subscription.view(self.subscription, self.subscription_status)
             return result
 
     def operation(self, request_id=None):
@@ -186,6 +205,109 @@ class Controller:
 
     def rules(self):
         return routing.view(json.loads(CONFIG.read_bytes()), private=True)
+
+    def subscription_settings(self):
+        with self.lock:
+            return subscription.view(self.subscription, self.subscription_status, private=True)
+
+    def subscription_record(self, **values):
+        with self.lock:
+            self.subscription_status.update(values)
+            atomic_write(STATE / "subscription-status.json", json.dumps(self.subscription_status).encode())
+
+    def start_subscription(self, request_id, settings=None, expected=None):
+        if not isinstance(request_id, str) or not re.fullmatch(r"[A-Za-z0-9-]{16,64}", request_id):
+            raise ValueError("Недопустимый идентификатор операции")
+        with self.lock:
+            if request_id in self.jobs:
+                return copy.deepcopy(self.jobs[request_id])
+            if self.subscription_active or (self.job and self.job["state"] in BUSY):
+                raise BlockingIOError()
+            if settings is not None:
+                if expected != self.subscription["revision"]:
+                    raise RoutingConflict("Настройки подписки изменились. Загрузите актуальные значения")
+                candidate = subscription.settings(self.subscription, settings)
+                candidate["revision"] = str(uuid.uuid4())
+                atomic_write(SUBSCRIPTION, json.dumps(candidate).encode())
+                self.subscription = candidate
+            if not self.subscription.get("url") and settings is None:
+                raise ValueError("Сначала сохраните ссылку подписки")
+            disabled = settings is not None and not self.subscription["enabled"]
+            self.job = {"id": request_id, "kind": "subscription", "state": "success" if disabled else "checking",
+                        "message": "Автообновление отключено. Текущее подключение сохранено" if disabled else "Получаем подписку и проверяем подключения отдельно от работающего VPN",
+                        "started_at": stamp(), "finished_at": stamp() if disabled else None}
+            self.jobs[request_id] = self.job
+            if len(self.jobs) > 8:
+                self.jobs.pop(next(iter(self.jobs)))
+            if disabled:
+                self.subscription_record(state="disabled", next_check_at=None, message=self.job["message"])
+            result = copy.deepcopy(self.job)
+            if not disabled:
+                self.subscription_active = True
+                threading.Thread(target=self.refresh_subscription, name="vpn-subscription", daemon=True).start()
+            return result
+
+    def subscription_due(self):
+        with self.lock:
+            if not self.subscription["enabled"] or self.subscription_active or (self.job and self.job["state"] in BUSY):
+                return
+            try:
+                due = datetime.fromisoformat(self.subscription_status["next_check_at"]).timestamp()
+            except (KeyError, TypeError, ValueError):
+                due = 0
+            if time.time() < due:
+                return
+        try:
+            self.start_subscription(str(uuid.uuid4()))
+        except BlockingIOError:
+            pass
+
+    def refresh_subscription(self):
+        try:
+            self.subscription_record(state="checking", last_check_at=stamp(), tested=0, working=0,
+                                     total=0, compatible=0, unsupported=0, duplicates=0, message="Проверяем подписку")
+            with self.lock:
+                url = self.subscription["url"]
+            nodes, counts = subscription.decode(subscription.fetch(url), parse_uri)
+            self.subscription_record(**counts)
+            current = json.loads(CONFIG.read_bytes())
+            current_outbound = next(item for item in current["outbounds"] if item.get("tag") == "vless-only")
+            measured = []
+            started = time.monotonic()
+            for index, node in enumerate(nodes, 1):
+                if time.monotonic() - started > 600:
+                    raise ValueError("Проверка подписки превысила 10 минут. Действующий VPN сохранён")
+                self.set_job(state="checking", message=f"Проверяем подключение {index} из {len(nodes)}; рабочий VPN не прерывается")
+                candidate = copy.deepcopy(current)
+                candidate["outbounds"] = [node["outbound"] if item.get("tag") == "vless-only" else item for item in current["outbounds"]]
+                try:
+                    checked = self.candidate_probe(candidate, samples=3, check_llm=True)
+                    measured.append((checked["latency_ms"], node["outbound"] != current_outbound, node["index"], node["outbound"]))
+                except Exception:
+                    pass
+                self.subscription_record(tested=index, working=len(measured))
+            if not measured:
+                raise ValueError("Ни один профиль не прошёл проверки HTTPS и LLM API. Действующий VPN сохранён")
+            latency, _, selected, outbound = min(measured, key=lambda item: item[:3])
+            # Reuse the same serialized transaction, rollback and img2txt sync.
+            self.replace(outbound)
+            if self.operation()["state"] != "success":
+                raise ValueError("Не удалось применить выбранное подключение; проверьте статус VPN")
+            message = f"Подписка проверена: работают {len(measured)} из {len(nodes)}. Выбрано подключение №{selected}, HTTPS {latency} мс"
+            self.subscription_record(state="success", last_success_at=stamp(), selected_index=selected, latency_ms=latency, message=message)
+            self.set_job(state="success", message=message, finished_at=stamp())
+        except Exception as error:
+            message = str(error) if isinstance(error, ValueError) and len(str(error)) < 160 and "\n" not in str(error) else "Не удалось обновить подписку. Проверьте действующее подключение VPN"
+            self.subscription_record(state="error", message=message)
+            self.set_job(state="error", message=message, finished_at=stamp())
+        finally:
+            try:
+                with self.lock:
+                    next_check = datetime.fromtimestamp(time.time() + self.subscription["interval_hours"] * 3600, timezone.utc).isoformat() if self.subscription["enabled"] else None
+                    self.subscription_record(next_check_at=next_check)
+            finally:
+                self.subscription_active = False
+            self.last_probe = 0.0
 
     def submit_rules(self, request):
         manual = routing.manual_policy(request.get("direct"), request.get("vpn"))
@@ -197,7 +319,7 @@ class Controller:
         with self.lock:
             if request_id in self.jobs:
                 return copy.deepcopy(self.jobs[request_id])
-            if self.job and self.job["state"] in BUSY:
+            if self.subscription_active or (self.job and self.job["state"] in BUSY):
                 raise BlockingIOError()
             if manual is not None and expected != routing.revision(json.loads(CONFIG.read_bytes())):
                 raise RoutingConflict("Правила изменились. Загрузите актуальные списки перед сохранением")
@@ -279,7 +401,7 @@ class Controller:
         with self.lock:
             if request_id in self.jobs:
                 return copy.deepcopy(self.jobs[request_id])
-            if self.job and self.job["state"] in BUSY:
+            if self.subscription_active or (self.job and self.job["state"] in BUSY):
                 raise BlockingIOError("Другой ключ уже проверяется")
             self.job = {"id": request_id, "state": "checking", "message": "Проверяем новый ключ отдельно от работающего VPN", "started_at": stamp(), "finished_at": None}
             self.jobs[request_id] = self.job
@@ -289,12 +411,17 @@ class Controller:
         threading.Thread(target=self.replace, args=(outbound,), name="vpn-key-update", daemon=True).start()
         return result
 
-    def candidate_probe(self, config):
+    def candidate_probe(self, config, samples=1, check_llm=False):
         path = STATE / "dashboard-candidate.json"
         candidate = copy.deepcopy(config)
         candidate["inbounds"] = [{"tag": "probe", "listen": "127.0.0.1", "port": 11809, "protocol": "socks", "settings": {"auth": "noauth", "udp": False}}]
         # A key must pass the real VPN test, independent of all split-routing rules.
         candidate["outbounds"] = [item for item in config["outbounds"] if item["tag"] == "vless-only"]
+        host = candidate["outbounds"][0]["settings"]["vnext"][0]["address"]
+        resolved = command(["/usr/bin/getent", "ahosts", host], timeout=4)
+        addresses = {line.split()[0] for line in resolved.stdout.splitlines() if line.split()}
+        if not addresses or any(not subscription.is_public(address) for address in addresses):
+            raise ValueError("VPN-сервер должен иметь только публичные адреса")
         for name in ("api", "routing", "stats", "policy", "dns"):
             candidate.pop(name, None)
         atomic_write(path, json.dumps(candidate).encode())
@@ -312,7 +439,12 @@ class Controller:
                         break
                 except OSError:
                     time.sleep(.1)
-            return probe(11809)
+            measured = [probe(11809) for _ in range(samples)]
+            if check_llm:
+                checked = command(["/usr/bin/curl", "-4sS", "--max-time", "8", "--connect-timeout", "4", "--proxy", "socks5h://127.0.0.1:11809", "--noproxy", "", "--output", "/dev/null", "--write-out", "%{http_code}", "https://api.groq.com/openai/v1/models"], timeout=10)
+                if checked.returncode or checked.stdout.strip() not in ("200", "401"):
+                    raise ValueError("Через это подключение недоступен LLM API")
+            return {**measured[-1], "latency_ms": round(statistics.median(item["latency_ms"] for item in measured))}
         finally:
             if process:
                 process.terminate()
@@ -335,7 +467,7 @@ class Controller:
             host = outbound["settings"]["vnext"][0]["address"]
             resolved = command(["/usr/bin/getent", "ahosts", host], timeout=4)
             addresses = {line.split()[0] for line in resolved.stdout.splitlines() if line.split()}
-            if not addresses or any(not ipaddress.ip_address(address).is_global for address in addresses):
+            if not addresses or any(not subscription.is_public(address) for address in addresses):
                 raise ValueError("VPN-сервер должен иметь доступный публичный адрес")
             self.candidate_probe(candidate)
             if candidate == current:
@@ -428,7 +560,7 @@ class Controller:
             pass
         with self.lock:
             self.data.update(sample)
-            busy = bool(self.job and self.job["state"] in BUSY)
+            busy = self.subscription_active or bool(self.job and self.job["state"] in BUSY)
             if not sample["service_running"]:
                 self.data["online"] = False
         if not busy and time.monotonic() - self.last_probe >= 30:
@@ -472,6 +604,10 @@ def main():
                     result = {"ok": True, "job": controller.submit_rules(request)}
                 elif operation == "refresh-rules":
                     result = {"ok": True, "job": controller.start_routing_job(request.get("request_id"))}
+                elif operation == "subscription":
+                    result = {"ok": True, "subscription": controller.subscription_settings()}
+                elif operation in ("set-subscription", "refresh-subscription"):
+                    result = {"ok": True, "job": controller.start_subscription(request.get("request_id"), request if operation == "set-subscription" else None, request.get("revision"))}
                 else:
                     raise ValueError("Неизвестная операция")
             except BlockingIOError:
@@ -498,6 +634,7 @@ def main():
             while not stop.is_set():
                 try:
                     controller.sample()
+                    controller.subscription_due()
                 except Exception:
                     with controller.lock:
                         controller.data.update(available=False, updated_at=stamp())

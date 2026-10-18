@@ -2,7 +2,8 @@
 
 ## Вне репозитория
 
-- `/etc/hardbox-vpn/xray.json`: настоящая VLESS-подписка.
+- `/etc/hardbox-vpn/xray.json`: настоящий VLESS-ключ.
+- `/etc/hardbox-vpn/subscription.json`: секретная ссылка подписки и расписание.
 - `/etc/hardbox-vpn/wifi.json` и профиль NetworkManager: Wi-Fi-пароль.
 - `/etc/hardbox-vpn/img2txt/xray.json`: производный ключ для контейнера.
 - `/var/lib/hardbox-vpn`: последние рабочие конфиги, pending-маркеры,
